@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Food Delivery System - Enhanced</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+    /* Reset and Base Styles */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Roboto', Arial, sans-serif;
+        background: #121212; /* Deeper Dark Mode Background */
+        color: #e0e0e0;
+        line-height: 1.6;
+    }
+
+    /* ---------------- TOP NAVBAR ---------------- */
+    header {
+        background: #ff4545; /* Brighter red accent */
+        padding: 15px 20px;
+        text-align: left;
+        color: white;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        position: sticky; /* Sticky header */
+        top: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+    }
+
+    /* ---------------- CONTAINER & MAIN LAYOUT ---------------- */
+    .container {
+        width: 95%;
+        max-width: 1400px;
+        margin: 30px auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr; /* Two columns: Menu and Cart/Status */
+        gap: 30px;
+    }
+
+    .main-content {
+        grid-column: 1 / 2;
+    }
+
+    .sidebar {
+        grid-column: 2 / 3;
+    }
+
+    h2 {
+        color: #ff4545;
+        margin-bottom: 20px;
+        border-bottom: 3px solid #333;
+        padding-bottom: 5px;
+        font-weight: 700;
+        font-size: 24px;
+        letter-spacing: 0.5px;
+    }
+
+    /* ---------------- CARDS ---------------- */
+    .card {
+        background: #1e1e1e; /* Darker card background */
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        margin-bottom: 25px;
+        border: 1px solid #333; /* Subtle border for definition */
+    }
+
+    /* ---------------- BUTTON ---------------- */
+    button {
+        background: #ff4545;
+        border: none;
+        padding: 12px 25px;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 700;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 10px rgba(255, 69, 69, 0.4);
+    }
+
+    button:hover {
+        background: #e62e2e;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(255, 69, 69, 0.6);
+    }
+
+    /* ---------------- RESTAURANT & MENU GRIDS ---------------- */
+    .menu-list, .restaurant-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+    }
+
+    .item-box {
+        background: #2a2a2a; /* Slightly lighter box for contrast */
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        transition: 0.3s ease;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .item-box:hover {
+        background: #3a3a3a;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    }
+    
+    .item-box h3, .item-box h4 {
+        margin: 8px 0;
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .item-box p {
+        margin: 5px 0 15px 0;
+        font-size: 16px;
+        color: #cccccc;
+    }
+
+    /* Cart Specific Styles */
+    #cart h3 {
+        color: #ff4545;
+        font-size: 20px;
+        margin-top: 0;
+    }
+
+    #cart b {
+        color: #66ff66; /* Green for total */
+        font-size: 18px;
+        display: block;
+        margin-top: 10px;
+    }
+    
+    .cart-item {
+        border-bottom: 1px dashed #444;
+        padding: 5px 0;
+        color: #e0e0e0;
+    }
+    
+    /* ---------------- STATUS BOX ---------------- */
+    .status-box {
+        padding: 18px;
+        background: #3d3400; /* Darkened yellow tone */
+        border-left: 6px solid #ffcc00;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 18px;
+        color: #fff8e1;
+        font-weight: 500;
+    }
+
+    /* ORDER STATUS ANIMATION */
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.02); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .highlight {
+        animation: pulse 1.5s infinite;
+        color: #66ff66; /* Bright green for active status */
+        font-weight: bold;
+    }
+    
+    .track-btn {
+        margin-top: 15px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 900px) {
+        .container {
+            grid-template-columns: 1fr; /* Stack columns on smaller screens */
+        }
+        .main-content, .sidebar {
+            grid-column: auto;
+        }
+    }
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <span style="font-size: 1.2em; margin-right: 15px;">🚀</span> Food Express
+</header>
+
+<div class="container">
+    <div class="main-content">
+        <h2>Restaurants</h2>
+        <div id="restaurants" class="restaurant-list"></div>
+    
+        <h2>Menu</h2>
+        <div id="menu" class="menu-list"></div>
+    </div>
+
+    <div class="sidebar">
+        <h2>Shopping Cart</h2>
+        <div id="cart" class="card"></div>
+    
+        <h2>Order Tracking</h2>
+        <div id="orderStatus" class="card"></div>
+    </div>
+</div>
+
+<script>
+/* ----------------------------------------------------------------------
+   RESTAURANT & MENU DATA
+---------------------------------------------------------------------- */
+const restaurants = [
+    {
+        id: 1,
+        name: "KFC - Crispy & Hot",
+        menu: [
+            { id: 1, name: "Zinger Burger", price: 150 },
+            { id: 2, name: "Hot Wings (6 Pcs)", price: 200 },
+            { id: 3, name: "Chicken Bucket (Small)", price: 450 }
+        ]
+    },
+    {
+        id: 2,
+        name: "Dominos - Pizza Hub",
+        menu: [
+            { id: 1, name: "Cheese Burst Pizza (Medium)", price: 350 },
+            { id: 2, name: "Garlic Bread Sticks", price: 120 },
+            { id: 3, name: "Pasta Italiano (Red Sauce)", price: 220 }
+        ]
+    },
+    {
+        id: 3,
+        name: "McDonald's - Fast Bites",
+        menu: [
+            { id: 1, name: "McChicken Burger", price: 130 },
+            { id: 2, name: "McFlurry Oreo", price: 90 },
+            { id: 3, name: "French Fries (Large)", price: 80 }
+        ]
+    }
+];
+
+let cart = [];
+let selectedRestaurant = null;
+let orderPlaced = false;
+let currentStatus = "No order placed";
+
+/* ---------------- DISPLAY RESTAURANTS ---------------- */
+function showRestaurants() {
+    let html = "";
+    restaurants.forEach(r => {
+        html += `
+            <div class="item-box">
+                <div>
+                    <h3>🍽️ ${r.name}</h3>
+                    <p>Cuisine: Fast Food</p>
+                </div>
+                <button onclick="showMenu(${r.id})">Browse Menu</button>
+            </div>
+        `;
+    });
+    document.getElementById("restaurants").innerHTML = html;
+}
+
+/* ---------------- DISPLAY MENU ---------------- */
+function showMenu(restId) {
+    selectedRestaurant = restaurants.find(r => r.id === restId);
+    cart = [];
+    updateCart();
+
+    let html = "";
+    selectedRestaurant.menu.forEach(item => {
+        html += `
+            <div class="item-box">
+                <div>
+                    <h4>${item.name}</h4>
+                    <p>Best Seller!</p>
+                </div>
+                <div>
+                    <p>Price: ₹**${item.price}**</p>
+                    <button onclick="addToCart(${item.id})">Add to Cart</button>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById("menu").innerHTML = html;
+    
+    // Scroll to the menu section for better UX
+    document.getElementById("menu").scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ---------------- ADD TO CART ---------------- */
+function addToCart(itemId) {
+    const item = selectedRestaurant.menu.find(m => m.id === itemId);
+    cart.push(item);
+    updateCart();
+}
+
+/* ---------------- UPDATE CART ---------------- */
+function updateCart() {
+    const cartElement = document.getElementById("cart");
+    
+    if (cart.length === 0) {
+        cartElement.innerHTML = `<i>Your cart is empty. Select a restaurant and add some delicious items!</i>`;
+        return;
+    }
+
+    let total = cart.reduce((sum, item) => sum + item.price, 0);
+
+    let itemsHtml = "<h3>Your Items:</h3>";
+    cart.forEach((item, index) => {
+        itemsHtml += `<div class="cart-item">
+                        🍟 ${item.name} - **₹${item.price}**
+                    </div>`;
+    });
+
+    let buttonStyle = "background:#00a300;"; // Green for primary action
+
+    let finalHtml = `
+        ${itemsHtml}
+        <br>
+        <b>Total: ₹${total}</b><br><br>
+        <button style="${buttonStyle}" onclick="placeOrder()">💰 Place Order Now</button>
+    `;
+
+    cartElement.innerHTML = finalHtml;
+}
+
+/* ---------------- PLACE ORDER ---------------- */
+function placeOrder() {
+    if (cart.length === 0) return alert("Cart is empty!");
+
+    orderPlaced = true;
+    currentStatus = "Order Placed";
+    alert(`Order for ₹${cart.reduce((sum, item) => sum + item.price, 0)} placed successfully!`);
+
+    updateStatus();
+    // Clear cart after placing order (optional, but common in real apps)
+    cart = []; 
+    updateCart(); 
+}
+
+/* ---------------- TRACK ORDER ---------------- */
+function trackOrder() {
+    if (!orderPlaced) return;
+
+    const statuses = ["Order Placed", "Preparing", "Out for Delivery", "Delivered"];
+    let index = statuses.indexOf(currentStatus);
+
+    if (index < statuses.length - 1) {
+        currentStatus = statuses[index + 1];
+    } else {
+        alert("Order already delivered! Enjoy your meal!");
+    }
+
+    updateStatus();
+}
+
+/* ---------------- UPDATE STATUS VIEW ---------------- */
+function updateStatus() {
+    let trackingButton = orderPlaced 
+        ? `<button class="track-btn" onclick="trackOrder()">Update Status</button>` 
+        : ``;
+        
+    let statusText = orderPlaced 
+        ? `Status: <span class="highlight">${currentStatus}</span>`
+        : `Status: No active order.`;
+
+    document.getElementById("orderStatus").innerHTML = `
+        <div class="status-box">
+            ${statusText}
+        </div>
+        ${trackingButton}
+    `;
+}
+
+// Initialize the page
+showRestaurants();
+updateStatus();
+</script>
+
+</body>
+</html>
